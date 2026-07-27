@@ -1,0 +1,21 @@
+from fastapi import FastAPI
+
+from app.api.document import router as document_router
+
+from app.database.create_tables import create_tables
+
+create_tables()
+
+app = FastAPI(
+    title="AI Research & Knowledge Assistant",
+    version="1.0.0",
+)
+
+app.include_router(document_router)
+
+
+@app.get("/")
+def root():
+    return {
+        "message": "AI Research Assistant Running"
+    }
