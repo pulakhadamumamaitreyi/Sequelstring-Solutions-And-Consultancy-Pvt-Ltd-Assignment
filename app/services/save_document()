@@ -1,0 +1,39 @@
+def save_document(db, filename, file_path):
+
+    import fitz
+
+    from app.rag.index_document import DocumentIndexer
+
+    pdf = fitz.open(file_path)
+
+    pages = len(pdf)
+
+    pdf.close()
+
+    document = Document(
+        document_name=filename,
+        file_path=file_path,
+        total_pages=pages,
+        processing_status="Processing"
+    )
+
+    db.add(document)
+
+    db.commit()
+
+    db.refresh(document)
+
+    total_chunks = DocumentIndexer.index(
+        document.id,
+        file_path
+    )
+
+    document.total_chunks = total_chunks
+
+    document.processing_status = "Completed"
+
+    db.commit()
+
+    db.refresh(document)
+
+    return document
